@@ -6,7 +6,7 @@ use std::path;
 
 use crate::error::{Error, Result};
 use crate::ffi;
-use crate::{CounterInput, DigitalInput, IoChannel};
+use crate::{CounterInput, IoChannel};
 
 // Differences to IMX counter:
 // By using function setting "pulse-direction" (meaning: counter)
@@ -27,18 +27,16 @@ pub struct Counter {
     trigger: ffi::IoCntTrigger,
     dir: ffi::IoCntDirection,
     preload: i32,
-    input: Box<dyn DigitalInput>,
 }
 
 impl Counter {
-    pub fn new(path: &'static str, input: Box<dyn DigitalInput>) -> Counter {
+    pub fn new(path: &'static str) -> Counter {
         Counter {
             path,
             function: ffi::IoCntMode::Counter,
             trigger: ffi::IoCntTrigger::RisingEdge,
             dir: ffi::IoCntDirection::Up,
             preload: 0,
-            input,
         }
     }
 }
@@ -48,15 +46,10 @@ impl IoChannel for Counter {
         if !path::Path::new(self.path).exists() {
             return Err(Error::generic_access_error());
         }
-
-        self.input.init(0)?;
-
         Ok(())
     }
 
     fn shutdown(&mut self) -> Result<()> {
-        self.input.shutdown()?;
-
         Ok(())
     }
 }

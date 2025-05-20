@@ -140,10 +140,7 @@ pub fn definition() -> Io {
         analog_inputs: vec![],
         analog_outputs: vec![],
         temp_sensors: vec![tmp0, tmp1],
-        counter_input: vec![Box::new(am62x::Counter::new(
-            CNT0_PATH,
-            Box::new(evdev::Di::new(&mut digi_inputs, evdev::KeyCode::KEY_F15)),
-        ))],
+        counter_input: vec![Box::new(am62x::Counter::new(CNT0_PATH))],
         relay_offset: Some(16),
         // maximum PWM period is 469754879ns (~469ms)
         pwm_outputs: vec![
