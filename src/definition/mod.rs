@@ -12,42 +12,23 @@ mod pi;
 use crate::shm;
 use crate::Io;
 
-use std::collections::HashMap;
-
-pub fn load_device_definition(device: &str) -> Io {
-    let mut definitions_map = HashMap::from([
-        ("ctr500", ctr500::definition as fn() -> Io),
-        ("ctr600", ctr600::definition as fn() -> Io),
-        ("ctr700", ctr700::definition as fn() -> Io),
-        ("ctr750", ctr750::definition as fn() -> Io),
-        ("ctr800", ctr800::definition as fn() -> Io),
-        ("pi", pi::definition as fn() -> Io),
-    ]);
-
-    match definitions_map.remove(device) {
-        Some(entry) => entry(),
-        None => fallback::definition(),
+pub fn load_device_definition(device_name: &str) -> Io {
+    match device_name {
+        "ctr500" => ctr500::definition(),
+        "ctr600" => ctr600::definition(),
+        "ctr700" => ctr700::definition(),
+        "ctr750" => ctr750::definition(),
+        "ctr800" => ctr800::definition(),
+        "pi" => pi::definition(),
+        _ => fallback::definition(),
     }
 }
 
-pub fn load_device_definition_shm(device: &str) -> Option<(Io, shm::Mappings)> {
-    let mut definitions_map = HashMap::from([
-        (
-            "ctr700",
-            ctr700::definition_shm as fn() -> (Io, shm::Mappings),
-        ),
-        (
-            "ctr750",
-            ctr750::definition_shm as fn() -> (Io, shm::Mappings),
-        ),
-        (
-            "ctr800",
-            ctr800::definition_shm as fn() -> (Io, shm::Mappings),
-        ),
-    ]);
-
-    match definitions_map.remove(device) {
-        Some(entry) => Some(entry()),
-        None => fallback::definition_shm(),
+pub fn load_device_definition_shm(device_name: &str) -> Option<(Io, shm::Mappings)> {
+    match device_name {
+        "ctr700" => Some(ctr700::definition_shm()),
+        "ctr750" => Some(ctr750::definition_shm()),
+        "ctr800" => Some(ctr800::definition_shm()),
+        _ => fallback::definition_shm(),
     }
 }
