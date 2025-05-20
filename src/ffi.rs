@@ -192,12 +192,9 @@ pub enum IoTmpSensorType {
 #[repr(u8)]
 #[derive(Debug, Copy, Clone)]
 pub enum IoCntMode {
-    /// The counter will count edges on digital input 14. The direction of
-    /// counting is determined by the value of digital input 15.
+    /// Count edges on a digital input
     Counter = 0,
-    /// The counter will count in A/B decoder mode. Digital input 14 is used
-    /// for the 'A' input and digital input 15 is used for 'B'. Switching the
-    /// inputs will result in inverse counting.
+    /// A/B encoder mode
     ABEncoder = 1,
 }
 
