@@ -8,14 +8,11 @@
 use std::sync::{Arc, Mutex};
 
 use crate::error::{Error, Result};
-use crate::hw_rev;
 use crate::Io;
 
 lazy_static! {
     static ref INSTANCE: Arc<Mutex<Io>> =
-        Arc::new(Mutex::new(crate::definition::load_device_definition(
-            &hw_rev::get_device_name().unwrap_or("fallback".to_string())
-        )));
+        Arc::new(Mutex::new(Io::new().expect("sysworxx-io initialize")));
 }
 
 #[repr(u32)]

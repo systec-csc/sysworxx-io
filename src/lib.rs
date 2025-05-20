@@ -132,6 +132,11 @@ pub struct IoChannelInfo<'a> {
 }
 
 impl Io {
+    pub fn new() -> Result<Self> {
+        let device_name = hw_rev::get_device_name().unwrap_or("".into());
+        Ok(definition::load_device_definition(&device_name))
+    }
+
     pub fn init(&mut self) -> Result<()> {
         self.run_led.init(0)?;
         self.err_led.init(0)?;
