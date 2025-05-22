@@ -13,6 +13,7 @@ members = [
     # ".",
     "ctr700drv",
     "Bindings/sysworxx-io-js",
+    "Bindings/sysworxx-io-py",
     "Bindings/Codesys",
     "Bindings/CSharp/SysworxxIoCsbindgen",
 ]

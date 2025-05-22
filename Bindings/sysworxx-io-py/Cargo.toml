@@ -1,0 +1,21 @@
+[package]
+name = "sysworxx-io-py"
+version = "0.1.0"
+edition = "2021"
+license = "LGPL-3.0-or-later"
+
+[lib]
+name = "sysworxx_io_py"
+crate-type = ["rlib", "cdylib"]
+
+[[bin]]
+name = "py-stub-gen"
+
+[dependencies]
+indexmap = { version="2.9.0", features = ["serde"] }
+once_cell = "1.21.3"
+pyo3 = { version = "0.25.0", features = ["extension-module", "indexmap"] }
+pyo3-stub-gen = "0.8.2"
+pythonize = "0.25.0"
+serde = { version = "1.0.219", features = ["derive"] }
+sysworxx-io = { path = "../.." }
