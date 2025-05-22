@@ -129,6 +129,7 @@ pub struct IoChannelInfo<'a> {
     pub analog_inputs: &'a Vec<Box<dyn AnalogInput>>,
     pub temp_sensors: &'a Vec<Box<dyn TempSensor<f64>>>,
     pub counter_inputs: &'a Vec<Box<dyn CounterInput>>,
+    pub pwm_outputs: &'a Vec<Box<dyn PwmOutput>>,
 }
 
 impl Io {
@@ -195,6 +196,7 @@ impl Io {
             analog_inputs: &self.analog_inputs,
             temp_sensors: &self.temp_sensors,
             counter_inputs: &self.counter_inputs,
+            pwm_outputs: &self.pwm_outputs,
         }
     }
 
