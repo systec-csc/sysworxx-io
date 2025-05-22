@@ -114,7 +114,7 @@ pub struct Io {
     analog_inputs: Vec<Box<dyn AnalogInput>>,
     analog_outputs: Vec<Box<dyn AnalogOutput>>,
     temp_sensors: Vec<Box<dyn TempSensor<f64>>>,
-    counter_input: Vec<Box<dyn CounterInput>>,
+    counter_inputs: Vec<Box<dyn CounterInput>>,
     relay_offset: Option<u8>,
     pwm_outputs: Vec<Box<dyn PwmOutput>>,
 }
@@ -128,7 +128,7 @@ pub struct IoChannelInfo<'a> {
     pub config_switch: &'a dyn DigitalInput,
     pub analog_inputs: &'a Vec<Box<dyn AnalogInput>>,
     pub temp_sensors: &'a Vec<Box<dyn TempSensor<f64>>>,
-    pub counter_input: &'a Vec<Box<dyn CounterInput>>,
+    pub counter_inputs: &'a Vec<Box<dyn CounterInput>>,
 }
 
 impl Io {
@@ -148,7 +148,7 @@ impl Io {
         channels_init!(self.analog_inputs);
         channels_init!(self.analog_outputs);
         channels_init!(self.temp_sensors);
-        channels_init!(self.counter_input);
+        channels_init!(self.counter_inputs);
         channels_init!(self.pwm_outputs);
         Ok(())
     }
@@ -164,7 +164,7 @@ impl Io {
         channels_shutdown!(self.analog_inputs);
         channels_shutdown!(self.analog_outputs);
         channels_shutdown!(self.temp_sensors);
-        channels_shutdown!(self.counter_input);
+        channels_shutdown!(self.counter_inputs);
         Ok(())
     }
 
@@ -194,7 +194,7 @@ impl Io {
             config_switch: self.config_switch.as_ref(),
             analog_inputs: &self.analog_inputs,
             temp_sensors: &self.temp_sensors,
-            counter_input: &self.counter_input,
+            counter_inputs: &self.counter_inputs,
         }
     }
 
@@ -205,7 +205,7 @@ impl Io {
         hwinfo.m_uAiChannels = self.analog_inputs.len() as u8;
         hwinfo.m_uAoChannels = self.analog_outputs.len() as u8;
         hwinfo.m_uTmpChannels = self.temp_sensors.len() as u8;
-        hwinfo.m_uCntChannels = self.counter_input.len() as u8;
+        hwinfo.m_uCntChannels = self.counter_inputs.len() as u8;
         match self.relay_offset {
             None => {
                 hwinfo.m_uLegacyRelayOffset = 0;
@@ -274,7 +274,7 @@ impl Io {
         add_to_json(&mut obj, "inputs", &self.inputs)?;
         add_to_json(&mut obj, "analog_inputs", &self.analog_inputs)?;
         add_to_json(&mut obj, "temp_sensors", &self.temp_sensors)?;
-        add_to_json(&mut obj, "counter_inputs", &self.counter_input)?;
+        add_to_json(&mut obj, "counter_inputs", &self.counter_inputs)?;
         add_to_json(&mut obj, "analog_outputs", &self.analog_outputs)?;
         let obj_str = obj.dump();
         let mut file = File::create(path).expect("Error creating file to write information!");
@@ -374,7 +374,7 @@ impl Io {
     }
 
     pub fn cnt_enable(&mut self, channel: usize, state: bool) -> Result<()> {
-        self.counter_input
+        self.counter_inputs
             .get_mut(channel)
             .ok_or(Error::InvalidChannel)?
             .enable(state)
@@ -387,21 +387,21 @@ impl Io {
         trigger: ffi::IoCntTrigger,
         direction: ffi::IoCntDirection,
     ) -> Result<()> {
-        self.counter_input
+        self.counter_inputs
             .get_mut(channel)
             .ok_or(Error::InvalidChannel)?
             .setup(mode, trigger, direction)
     }
 
     pub fn cnt_set_preload(&mut self, channel: usize, preload: i32) -> Result<()> {
-        self.counter_input
+        self.counter_inputs
             .get_mut(channel)
             .ok_or(Error::InvalidChannel)?
             .set_preload(preload)
     }
 
     pub fn cnt_get(&mut self, channel: usize) -> Result<i32> {
-        self.counter_input
+        self.counter_inputs
             .get_mut(channel)
             .ok_or(Error::InvalidChannel)?
             .get()

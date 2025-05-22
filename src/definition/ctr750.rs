@@ -245,7 +245,7 @@ pub fn definition() -> Io {
             Box::new(Labeled::new("TC2", shmio::Temp::new(&shm_sampler, 8))),
             Box::new(Labeled::new("TC3", shmio::Temp::new(&shm_sampler, 9))),
         ],
-        counter_input: vec![
+        counter_inputs: vec![
             Box::new(Labeled::new(
                 "CI0",
                 imx::Counter::new(
@@ -385,7 +385,7 @@ pub fn definition_shm() -> (Io, shm::Mappings) {
             Box::new(tc2),
             Box::new(tc3),
         ],
-        counter_input: vec![],
+        counter_inputs: vec![],
         relay_offset: None,
         pwm_outputs: vec![],
     };

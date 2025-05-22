@@ -186,7 +186,7 @@ pub fn definition() -> Io {
         ],
         analog_outputs: vec![],
         temp_sensors: vec![tmp0, tmp1],
-        counter_input: vec![Box::new(am62x::Counter::new(CNT0_PATH))],
+        counter_inputs: vec![Box::new(am62x::Counter::new(CNT0_PATH))],
         relay_offset: Some(16),
         // maximum PWM period is 469754879ns (~469ms)
         pwm_outputs: vec![
@@ -234,7 +234,7 @@ pub fn definition_shm() -> (Io, shm::Mappings) {
         ],
         analog_outputs: vec![],
         temp_sensors: vec![],
-        counter_input: vec![],
+        counter_inputs: vec![],
         relay_offset: None,
         pwm_outputs: vec![],
     };

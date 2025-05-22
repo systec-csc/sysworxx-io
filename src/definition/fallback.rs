@@ -102,7 +102,7 @@ pub fn definition() -> Io {
         analog_inputs: vec![],
         analog_outputs: vec![],
         temp_sensors: vec![],
-        counter_input: vec![],
+        counter_inputs: vec![],
         relay_offset: None,
         pwm_outputs: vec![],
     }

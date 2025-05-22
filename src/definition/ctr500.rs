@@ -145,7 +145,7 @@ pub fn definition() -> Io {
         analog_inputs: vec![],
         analog_outputs: vec![],
         temp_sensors: vec![tmp0, tmp1],
-        counter_input: vec![Box::new(imx::Counter::new(
+        counter_inputs: vec![Box::new(imx::Counter::new(
             CNT0_PATH,
             Box::new(evdev::Di::new(&mut digi_inputs, evdev::KeyCode::KEY_F3)),
             None,
