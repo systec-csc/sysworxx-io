@@ -371,14 +371,13 @@ namespace Sysworxx
         /// Enables events for a digital input channel.
         /// </summary>
         /// <param name="channel">The channel number.</param>
-        /// <param name="trigger">The trigger to raise the event.</param>
-        public void SetDigitalInputEvents(byte channel, InputTrigger trigger)
+        public void SetDigitalInputEvents(byte channel)
         {
             ThrowIfDisposed();
             if (!interruptChannels.Contains(channel))
             {
                 unsafe {
-                    ThrowOnError(SysworxxIoSys.IoRegisterInputCallback(channel, &InputHandler, trigger.ToInternal()));
+                    ThrowOnError(SysworxxIoSys.IoRegisterInputCallback(channel, &InputHandler, IoInputTrigger.BothEdge));
                 }
                 interruptChannels.Add(channel);
             }
@@ -662,13 +661,6 @@ namespace Sysworxx
         Current,
     }
 
-    public enum InputTrigger {
-        None,
-        RisingEdge,
-        FallingEdge,
-        BothEdge,
-    }
-
     internal static class SysworxxIoSysConversionsExt
     {
         #region primitive to SysworxxIoSys
@@ -745,18 +737,6 @@ namespace Sysworxx
             {
                 case AnalogMode.Voltage: return IoAnalogMode.Voltage;
                 case AnalogMode.Current : return IoAnalogMode.Current;
-                default: throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        internal static IoInputTrigger ToInternal(this InputTrigger value)
-        {
-            switch (value)
-            {
-                case InputTrigger.None: return IoInputTrigger.None;
-                case InputTrigger.RisingEdge: return IoInputTrigger.RisingEdge;
-                case InputTrigger.FallingEdge: return IoInputTrigger.FallingEdge;
-                case InputTrigger.BothEdge: return IoInputTrigger.BothEdge;
                 default: throw new ArgumentOutOfRangeException();
             }
         }

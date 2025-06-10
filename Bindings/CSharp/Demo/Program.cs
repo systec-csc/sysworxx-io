@@ -291,7 +291,7 @@ namespace Program
             {
                 try
                 {
-                    driver.SetDigitalInputEvents(channel, InputTrigger.BothEdge);
+                    driver.SetDigitalInputEvents(channel);
                     Console.WriteLine($"Registered Input {channel}");
                 }
                 catch (IoException)
@@ -370,7 +370,7 @@ namespace Program
             {
                 try
                 {
-                    driver.SetDigitalInputEvents(channel, InputTrigger.None);
+                    driver.SetDigitalInputEvents(channel);
                     Console.WriteLine($"Registered Input {channel}");
                 }
                 catch (IoException)

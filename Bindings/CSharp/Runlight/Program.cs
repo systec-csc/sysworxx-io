@@ -83,7 +83,7 @@ namespace Program
             for (byte channel = 0; channel < 3; channel++)
             {
                 Console.WriteLine($"Register DI interrupt for channel {channel}");
-                io.SetDigitalInputEvents(channel, InputTrigger.RisingEdge);
+                io.SetDigitalInputEvents(channel);
             }
             io.DigitalInputChanged += OnDigitalInputChanged;
         }
@@ -172,7 +172,9 @@ namespace Program
         /// </summary>
         private static void OnDigitalInputChanged(object sender, DigitalInputChangedEventArgs args)
         {
-            mode = (Mode)args.Channel;
+            if (args.State == true) {
+                mode = (Mode)args.Channel;
+            }
         }
 
         /// <summary>
