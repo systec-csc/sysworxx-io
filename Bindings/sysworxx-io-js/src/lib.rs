@@ -87,7 +87,7 @@ fn register_input_interrupt(mut cx: FunctionContext) -> JsResult<JsString> {
     }
 }
 
-fn unregister_input_interrupt(mut cx: FunctionContext) -> JsResult<JsString> {
+fn unregister_input_interrupt(mut cx: FunctionContext) -> JsResult<JsUndefined> {
     let input_channel = cx.argument::<JsNumber>(0)?.value(&mut cx) as u8;
     let callback_uid = cx
         .argument::<JsString>(1)?
@@ -106,7 +106,7 @@ fn unregister_input_interrupt(mut cx: FunctionContext) -> JsResult<JsString> {
                 Some(callback_function) => callback_function.drop(&mut cx),
                 None => {}
             }
-            Ok(cx.string("good"))
+            Ok(cx.undefined())
         }
         Err(_) => cx.throw_error(format!("Error while reading sysWORXX-io instance!")),
     }
