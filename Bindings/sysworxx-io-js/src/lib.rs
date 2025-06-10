@@ -57,13 +57,6 @@ fn register_input_interrupt(mut cx: FunctionContext) -> JsResult<JsString> {
     //return uid from Instance -> remember in node
     let interface_channel = cx.argument::<JsNumber>(0)?.value(&mut cx) as u8;
     let callback_function = cx.argument::<JsFunction>(1)?.root(&mut cx);
-    let interrupt_trigger = match cx.argument::<JsNumber>(2)?.value(&mut cx) as u32 {
-        0 => IoInputTrigger::None,
-        1 => IoInputTrigger::RisingEdge,
-        2 => IoInputTrigger::FallingEdge,
-        3 => IoInputTrigger::BothEdge,
-        _ => IoInputTrigger::None,
-    };
     let instance = INSTANCE.lock();
 
     match instance {
@@ -78,7 +71,11 @@ fn register_input_interrupt(mut cx: FunctionContext) -> JsResult<JsString> {
                 .insert(current_uid, callback_function);
 
             let ret = unsafe {
-                IoRegisterInputCallback(interface_channel, Some(input_callback), interrupt_trigger)
+                IoRegisterInputCallback(
+                    interface_channel,
+                    Some(input_callback),
+                    IoInputTrigger::BothEdge,
+                )
             };
 
             match ret {

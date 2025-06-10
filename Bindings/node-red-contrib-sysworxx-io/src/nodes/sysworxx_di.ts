@@ -39,7 +39,7 @@ const initNode: NodeInitializer = (RED): void => {
         }
 
         function registerInputInterrupt() {
-            thisNode.uid = io.register_input_interrupt(getDigitalInput(), callbackFunction, 3);
+            thisNode.uid = io.register_input_interrupt(getDigitalInput(), callbackFunction);
         }
 
         function callbackFunction(channel: number, state: number) {
