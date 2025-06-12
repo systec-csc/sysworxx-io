@@ -3,4 +3,15 @@ pre-build = ["dpkg --add-architecture $CROSS_DEB_ARCH", """ \
     apt-get update && \
     apt-get --assume-yes install \
         libiio-dev:$CROSS_DEB_ARCH \
-        libsensors4-dev:$CROSS_DEB_ARCH"""]
+        libsensors4-dev:$CROSS_DEB_ARCH \
+        python3.8 \
+    """,
+]
+
+[build.env]
+passthrough = [
+    "PYO3_CROSS=1",
+    "PYO3_CROSS_PYTHON_VERSION=3.8",
+    "PYO3_CROSS_LIB_DIR=/usr/lib",
+    "PYO3_PYTHON=python3.8",
+]
