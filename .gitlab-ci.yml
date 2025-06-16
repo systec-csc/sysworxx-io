@@ -16,14 +16,14 @@ default:
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
       changes:
-        compare_to: "refs/heads/master~1"
+        compare_to: "refs/heads/main~1"
         paths:
-          - docker/**/*
+          - docker/*
     - if: $CI_COMMIT_BRANCH
       changes:
-        compare_to: "refs/heads/master"
+        compare_to: "refs/heads/main"
         paths:
-          - docker/**/*
+          - docker/*
 
 docker-image-tag:
   stage: docker-image-tag
