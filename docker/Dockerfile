@@ -5,6 +5,7 @@ FROM rust:1.85.1-slim
 
 RUN    dpkg --add-architecture armhf \
     && dpkg --add-architecture arm64 \
+    && dpkg --add-architecture i386 \
     && apt-get update \
     && apt-get install -y \
         libiio-dev:armhf \
@@ -17,6 +18,18 @@ RUN    dpkg --add-architecture armhf \
     && apt-get install -y \
         libiio-dev \
         libsensors4-dev
+
+# HACK: Installing 32-bit and 64-bit versions at the same time is not possible
+# with apt. (one replaces the other) Therefore the CI must install the correct
+# version beforehand. Installing both versions once simplifies installation in
+# the CI since dependencies are already available.
+RUN    apt-get download \
+        python3.11-minimal \
+        python3.11-minimal:i386 \
+    && apt-get -y install \
+        python3.11-minimal:i386 \
+    && apt-get -y install \
+        python3.11-minimal
 
 RUN rustup target add \
         armv7-unknown-linux-gnueabihf \

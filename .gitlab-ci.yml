@@ -58,9 +58,18 @@ docker-image:
 .build:
   stage: build
   script:
+    - dpkg -i /python3.11-minimal*_$ARCH_PYTHON_DEB.deb
     - cargo fmt --check
     - cargo build --release --target "$ARCH"
+    - |
+      # for building Python bindings (pyo3)
+      export PYO3_CROSS=1
+      export PYO3_CROSS_PYTHON_VERSION=3.11
+      export PYO3_CROSS_LIB_DIR=/usr/lib
+      export PYO3_PYTHON=python3.11
+      export _PYTHON_SYSCONFIGDATA_NAME=$PYTHON_SYSCONFIGDATA_NAME
     - cargo build --release --workspace --target "$ARCH"
+    - mv target/$ARCH/release/libsysworxx_io_py.so target/$ARCH/release/sysworxx_io_py.so
   artifacts:
     name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
     when: on_success
@@ -71,6 +80,7 @@ docker-image:
       - target/$ARCH/release/libctr700drv.so
       - target/$ARCH/release/libsysworxx_io.so
       - target/$ARCH/release/libsysworxx_io_js.so
+      - target/$ARCH/release/sysworxx_io_py.so
       - target/$ARCH/release/codesys-connector
       - Bindings/Codesys/systemd/codesys-connector.service
       - Bindings/Codesys/systemd/codesys-generate-devdesc-xml.service
@@ -107,7 +117,6 @@ docker-image:
     - cp -r Bindings/C      sysworxx-io-demo-bindings/usr/share/libctr700drv/demo/
     - cp -r Bindings/CSharp sysworxx-io-demo-bindings/usr/share/libctr700drv/demo/
     - cp -r Bindings/Java   sysworxx-io-demo-bindings/usr/share/libctr700drv/demo/
-    - cp -r Bindings/Python sysworxx-io-demo-bindings/usr/share/libctr700drv/demo/
     - dpkg-deb --build sysworxx-io-demo-bindings
   artifacts:
     name: "sysworxx-io-$CI_JOB_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
@@ -121,12 +130,16 @@ build-armv7-unknown-linux-gnueabihf:
   extends: .build
   variables:
     ARCH: armv7-unknown-linux-gnueabihf
+    ARCH_PYTHON_DEB: i386
+    PYTHON_SYSCONFIGDATA_NAME: _sysconfigdata__i386-linux-gnu
 
 build-aarch64-unknown-linux-gnu:
   dependencies: [docker-image-tag, docker-image]
   extends: .build
   variables:
     ARCH: aarch64-unknown-linux-gnu
+    ARCH_PYTHON_DEB: amd64
+    PYTHON_SYSCONFIGDATA_NAME: _sysconfigdata__x86_64-linux-gnu
 
 package-armv7-unknown-linux-gnueabihf:
   dependencies:
