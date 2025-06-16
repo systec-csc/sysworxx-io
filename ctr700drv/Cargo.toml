@@ -3,8 +3,9 @@ name = "ctr700drv"
 version = "2.2.0"
 authors = ["Daniel Krüger"]
 edition = "2018"
-description = "Deprecated I/O library for accessing basic peripherals (digital/analog I/O's, watchdog, etc) on sysWORXX CTR-700. Use sysworxx-io library for new projects instead."
 license = "LGPL-3.0-or-later"
+homepage = "https://www.systec-electronic.com"
+description = "Deprecated I/O library for accessing basic peripherals (digital/analog I/O's, watchdog, etc) on sysWORXX CTR-700. Use sysworxx-io library for new projects instead."
 
 [lib]
 crate-type = ["rlib", "staticlib", "cdylib"]
