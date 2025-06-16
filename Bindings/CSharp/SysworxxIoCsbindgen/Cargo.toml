@@ -2,6 +2,7 @@
 name = "SysworxxIoCsbindgen"
 version = "2.2.0"
 edition = "2021"
+license = "LGPL-3.0-or-later"
 
 [lib]
 crate-type = ["cdylib"]
