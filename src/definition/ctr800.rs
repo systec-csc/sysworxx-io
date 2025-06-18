@@ -13,6 +13,8 @@ use crate::shm;
 use crate::Io;
 
 const CNT0_PATH: &str = "/sys/bus/counter/devices/counter0/count0/";
+const PWM0_NAME: &str = "23010000.pwm";
+const PWM1_NAME: &str = "23020000.pwm";
 
 pub fn definition() -> Io {
     let tmp0 = Box::new(Labeled::new(
@@ -56,8 +58,14 @@ pub fn definition() -> Io {
             lookup.gpio_do("DO12", "600000.gpio", 19),
             lookup.gpio_do("DO13", "600000.gpio", 20),
             // 14
-            Box::new(Labeled::new("DO14", sysfs::Pwm::new(0, 0))), // chip 0, channel 0
-            Box::new(Labeled::new("DO15", sysfs::Pwm::new(2, 0))), // chip 2, channel 0
+            Box::new(Labeled::new(
+                "DO14",
+                sysfs::Pwm::from_platform(PWM0_NAME, 0).expect("PWM0"),
+            )),
+            Box::new(Labeled::new(
+                "DO15",
+                sysfs::Pwm::from_platform(PWM1_NAME, 0).expect("PWM1"),
+            )),
             // 16
             lookup.gpio_do("Relay0", "600000.gpio", 3),
             lookup.gpio_do("Relay1", "600000.gpio", 4),
@@ -190,8 +198,8 @@ pub fn definition() -> Io {
         relay_offset: Some(16),
         // maximum PWM period is 469754879ns (~469ms)
         pwm_outputs: vec![
-            Box::new(sysfs::Pwm::new(0, 0)), // chip, channel
-            Box::new(sysfs::Pwm::new(2, 0)), // chip, channel
+            Box::new(sysfs::Pwm::from_platform(PWM0_NAME, 0).expect("PWM0")),
+            Box::new(sysfs::Pwm::from_platform(PWM1_NAME, 0).expect("PWM1")),
         ],
     }
 }

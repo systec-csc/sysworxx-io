@@ -331,6 +331,29 @@ impl Pwm {
             },
         }
     }
+
+    pub fn from_platform(plat_name: &str, channel: usize) -> crate::error::Result<Pwm> {
+        let plat_path = std::path::PathBuf::from("/sys/bus/platform/devices/")
+            .join(plat_name)
+            .join("pwm");
+
+        for entry in plat_path.read_dir()? {
+            let entry = entry?;
+            let path = entry.path();
+            let name = path.file_name();
+
+            let Some(name) = name else {
+                continue;
+            };
+
+            if let Some(num) = name.to_string_lossy().strip_prefix("pwmchip") {
+                let chip = num.parse()?;
+                return Ok(Self::new(chip, channel));
+            };
+        }
+
+        Err(crate::error::Error::generic_access_error())
+    }
 }
 
 impl IoChannel for Pwm {
