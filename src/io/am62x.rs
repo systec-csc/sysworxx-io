@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2025 SYS TEC electronic AG <https://www.systec-electronic.com/>
 
 use std::fs;
+use std::i32;
 use std::path;
 
 use crate::error::{Error, Result};
@@ -57,9 +58,13 @@ impl IoChannel for Counter {
 impl CounterInput for Counter {
     fn enable(&mut self, state: bool) -> Result<()> {
         let path_enable = format!("{}/enable", self.path);
+        let path_ceiling = format!("{}/ceiling", self.path);
+        let path_count = format!("{}/count", self.path);
 
         if state {
             fs::write(&path_enable, b"0")?;
+            fs::write(&path_count, self.preload.to_string())?;
+            fs::write(&path_ceiling, i32::MAX.to_string())?;
 
             use ffi::IoCntMode::*;
             let attr_function = match self.function {
@@ -115,13 +120,10 @@ impl CounterInput for Counter {
     fn get(&mut self) -> Result<i32> {
         let path = format!("{}/count", self.path);
         let value = fs::read_to_string(path)?;
-        let mut value = value
+        let value = value
             .trim()
             .parse::<i32>()
             .map_err(|_| Error::generic_access_error())?;
-
-        value += self.preload;
-
         Ok(value)
     }
 }
