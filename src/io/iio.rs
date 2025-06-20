@@ -35,7 +35,7 @@ pub enum ChanAttr {
 pub fn lookup_id_for_spi(bus: usize, slave: usize) -> Result<String> {
     use std::path::Path;
 
-    let spi_path = format!("/sys/bus/spi/devices/spi{}.{}", bus, slave);
+    let spi_path = format!("/sys/bus/spi/devices/spi{bus}.{slave}");
     let spi_path = Path::new(&spi_path);
 
     for entry in spi_path.read_dir()? {
@@ -125,7 +125,7 @@ impl<T: 'static + Getter<Out = T> + Send + Copy + std::fmt::Debug> SamplerInner<
 
                     for (index, value) in values_cloned.lock().unwrap().iter_mut() {
                         if let Some(channel) = channels.get(*index) {
-                            trace!("{} => {:?}", index, value);
+                            trace!("{index} => {value:?}");
                             *value = Some(T::read(channel));
                         } else {
                             error!("invalid channel");
@@ -134,7 +134,7 @@ impl<T: 'static + Getter<Out = T> + Send + Copy + std::fmt::Debug> SamplerInner<
 
                     tx.send(shm::Event::Update).ok();
 
-                    debug!("{}: {:?}", &name_cloned, interval.elapsed())
+                    debug!("{name_cloned}: {:?}", interval.elapsed())
                 }
             })
             .unwrap();
@@ -329,7 +329,7 @@ impl Setter for i64 {
     fn write(channel: &iio::Channel, value: i64) {
         match channel.attr_write_int("raw", value) {
             Ok(_) => {}
-            Err(e) => error!("iio write failed: {}", e),
+            Err(e) => error!("iio write failed: {e}"),
         }
     }
 }
@@ -418,7 +418,7 @@ impl Ao {
             gain,
             offset,
             clipper,
-            last_value: std::i64::MAX,
+            last_value: i64::MAX,
         }
     }
 }
@@ -494,7 +494,7 @@ impl TempSensor<f64> for TempRtd {
         if let Some(ohms) = sampler.get(self.index) {
             Ok(ohms)
         } else {
-            Ok(std::f64::MIN)
+            Ok(f64::MIN)
         }
     }
 
@@ -587,10 +587,10 @@ impl TempSensor<f64> for TempTc {
                 let mvolts = mvolts * self.gain + self.offset;
                 Ok(tc::calc_temperature(ambient, mvolts))
             } else {
-                Ok(std::f64::MIN)
+                Ok(f64::MIN)
             }
         } else {
-            Ok(std::f64::MIN)
+            Ok(f64::MIN)
         }
     }
 }

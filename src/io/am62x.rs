@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2025 SYS TEC electronic AG <https://www.systec-electronic.com/>
 
 use std::fs;
-use std::i32;
 use std::path;
 
 use crate::error::{Error, Result};

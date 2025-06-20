@@ -143,7 +143,7 @@ impl ShmImage {
         })
     }
 
-    fn lock(&mut self) -> ShmImageGuard {
+    fn lock(&mut self) -> ShmImageGuard<'_> {
         ShmImageGuard {
             guard: self.mutex.lock().expect("access shared memory locked"),
             analog_values_offset: self.analog_values_offset,
@@ -154,7 +154,7 @@ impl ShmImage {
     }
 }
 
-impl<'g> ShmImageGuard<'g> {
+impl ShmImageGuard<'_> {
     fn analog_value(&mut self, index: usize) -> &mut i64 {
         let values =
             (*self.guard).wrapping_add(self.analog_values_offset) as *mut AnalogInputValues;
@@ -195,7 +195,7 @@ impl ShmServer {
         })
     }
 
-    pub fn lock(&mut self) -> ShmServerGuard {
+    pub fn lock(&mut self) -> ShmServerGuard<'_> {
         ShmServerGuard(self.image.lock())
     }
 
@@ -211,7 +211,7 @@ impl ShmServer {
     }
 }
 
-impl<'g> ShmServerGuard<'g> {
+impl ShmServerGuard<'_> {
     pub fn analog_value_set(&mut self, index: usize, value: i64) {
         *self.0.analog_value(index) = value
     }
@@ -252,7 +252,7 @@ impl ShmClient {
         })
     }
 
-    pub fn lock(&mut self) -> ShmClientGuard {
+    pub fn lock(&mut self) -> ShmClientGuard<'_> {
         ShmClientGuard(self.image.lock())
     }
 
@@ -268,7 +268,7 @@ impl ShmClient {
     }
 }
 
-impl<'g> ShmClientGuard<'g> {
+impl ShmClientGuard<'_> {
     pub fn analog_value_get(&mut self, index: usize) -> i64 {
         *self.0.analog_value(index)
     }

@@ -151,12 +151,9 @@ impl PwmSysFs {
     fn update(&mut self, period: u32, duty_cycle: u32) -> Result<()> {
         let base_path = self.base_path();
         // The PWM cannot be used, if the period and duty_cycle are not initialized
-        write(format!("{}/duty_cycle", base_path), "0").ok(); // Ignore any error
-        write(format!("{}/period", base_path), format!("{}", period))?;
-        write(
-            format!("{}/duty_cycle", base_path),
-            format!("{}", duty_cycle),
-        )?;
+        write(format!("{base_path}/duty_cycle"), "0").ok(); // Ignore any error
+        write(format!("{base_path}/period"), format!("{period}"))?;
+        write(format!("{base_path}/duty_cycle"), format!("{duty_cycle}"))?;
         Ok(())
     }
 
@@ -165,10 +162,10 @@ impl PwmSysFs {
     }
 
     fn enable(&mut self, enable: bool) -> Result<()> {
-        debug!("Set PWM {} = {}", self.channel, enable);
+        debug!("Set PWM {} = {enable}", self.channel);
         let base_path = self.base_path();
         let v = if enable { b"1" } else { b"0" };
-        write(format!("{}/enable", base_path), v)?;
+        write(format!("{base_path}/enable"), v)?;
         Ok(())
     }
 }

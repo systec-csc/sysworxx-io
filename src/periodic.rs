@@ -39,9 +39,8 @@ impl Periodic {
 
         while diff > self.interval {
             error!(
-                "missed interval (thread: {:?}, {:?})",
-                thread::current().name(),
-                diff
+                "missed interval (thread: {:?}, {diff:?})",
+                thread::current().name()
             );
             last += self.interval;
             diff = now - last;

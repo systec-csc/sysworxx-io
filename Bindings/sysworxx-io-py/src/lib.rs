@@ -265,7 +265,7 @@ extern "C" fn input_callback(channel: u8, value: IoBool) -> () {
             let value: bool = *value;
             let res = cb.func.call(py, (channel, value), None);
             if let Err(err) = res {
-                eprintln!("{}", err);
+                eprintln!("{err}");
             }
         }
     });

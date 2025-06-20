@@ -43,9 +43,9 @@ fn mvolts_to_temp(mvolts: f64) -> f64 {
 
 fn temp_to_mvolts(temp: f64) -> f64 {
     if temp <= TC_START {
-        std::f64::NEG_INFINITY
+        f64::NEG_INFINITY
     } else if temp >= TC_END {
-        std::f64::INFINITY
+        f64::INFINITY
     } else {
         let float_index1 = (temp - TC_START) / TC_STEP;
 
