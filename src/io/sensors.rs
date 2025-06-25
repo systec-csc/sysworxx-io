@@ -60,7 +60,7 @@ impl LmSensor {
                     interval.next();
 
                     match subfeature.get_value() {
-                        Err(_) => warn!("Failed to get sensor value for: {}", name.to_string()),
+                        Err(_) => warn!("Failed to get sensor value for: {name}"),
                         Ok(value) => {
                             let mut cloned = cloned.lock().unwrap();
                             *cloned = value;

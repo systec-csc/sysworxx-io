@@ -208,7 +208,7 @@ pub fn definition() -> Io {
         ],
         analog_outputs: vec![],
         temp_sensors: vec![tmp0, tmp1],
-        counter_input: vec![Box::new(imx::Counter::new(
+        counter_inputs: vec![Box::new(imx::Counter::new(
             CNT0_PATH,
             Box::new(evdev::Di::new(&mut digi_inputs, evdev::KeyCode::KEY_F15)),
             None,
@@ -258,7 +258,7 @@ pub fn definition_shm() -> (Io, shm::Mappings) {
         ],
         analog_outputs: vec![],
         temp_sensors: vec![],
-        counter_input: vec![],
+        counter_inputs: vec![],
         relay_offset: None,
         pwm_outputs: vec![],
     };

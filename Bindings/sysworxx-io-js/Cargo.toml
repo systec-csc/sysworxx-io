@@ -1,8 +1,11 @@
 [package]
 name = "sysworxx-io-js"
 version = "2.2.1"
+authors = ["Christian Schuster"]
 license = "LGPL-3.0-or-later"
 edition = "2018"
+homepage = "https://www.systec-electronic.com"
+description = "Node.js bindings to sysworxx-io"
 exclude = ["index.node"]
 
 [lib]

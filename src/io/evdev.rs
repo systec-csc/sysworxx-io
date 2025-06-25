@@ -33,7 +33,7 @@ impl EvdevCollector {
             .lock()
             .unwrap()
             .supported_keys()
-            .map_or(false, |keys| keys.contains(key))
+            .is_some_and(|keys| keys.contains(key))
     }
 
     pub fn from_name(devname: &str) -> Result<EvdevCollector> {

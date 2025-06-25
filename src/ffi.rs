@@ -8,14 +8,11 @@
 use std::sync::{Arc, Mutex};
 
 use crate::error::{Error, Result};
-use crate::hw_rev;
 use crate::Io;
 
 lazy_static! {
     static ref INSTANCE: Arc<Mutex<Io>> =
-        Arc::new(Mutex::new(crate::definition::load_device_definition(
-            &hw_rev::get_device_name().unwrap_or("fallback".to_string())
-        )));
+        Arc::new(Mutex::new(Io::new().expect("sysworxx-io initialize")));
 }
 
 #[repr(u32)]
@@ -192,12 +189,9 @@ pub enum IoTmpSensorType {
 #[repr(u8)]
 #[derive(Debug, Copy, Clone)]
 pub enum IoCntMode {
-    /// The counter will count edges on digital input 14. The direction of
-    /// counting is determined by the value of digital input 15.
+    /// Count edges on a digital input
     Counter = 0,
-    /// The counter will count in A/B decoder mode. Digital input 14 is used
-    /// for the 'A' input and digital input 15 is used for 'B'. Switching the
-    /// inputs will result in inverse counting.
+    /// A/B encoder mode
     ABEncoder = 1,
 }
 
@@ -237,7 +231,7 @@ pub extern "C" fn IoInit() -> IoResult {
     let env = Env::new().filter("IO_LOG").write_style("IO_LOG_STYLE");
     match env_logger::try_init_from_env(env) {
         Ok(_) => {}
-        Err(e) => warn!("Failed to initialize logger: {}", e),
+        Err(e) => warn!("Failed to initialize logger: {e}"),
     }
 
     debug!("IoInit");
@@ -277,7 +271,7 @@ pub extern "C" fn IoShutdown() -> IoResult {
 /// `puMinor_p` must be a valid pointer
 #[no_mangle]
 pub unsafe extern "C" fn IoGetVersion(puMajor_p: *mut u8, puMinor_p: *mut u8) -> IoResult {
-    debug!("IoGetVersion({:?}, {:?})", puMajor_p, puMinor_p);
+    debug!("IoGetVersion({puMajor_p:?}, {puMinor_p:?})");
 
     catch_unwind! {{
         check_ptr!(puMajor_p, IoResult::InvalidParameter);
@@ -305,7 +299,7 @@ pub unsafe extern "C" fn IoGetVersion(puMajor_p: *mut u8, puMinor_p: *mut u8) ->
 /// `puTickCount_p` must be a valid pointer
 #[no_mangle]
 pub unsafe extern "C" fn IoGetTickCount(puTickCount_p: *mut u32) -> IoResult {
-    debug!("IoGetTickCount({:?})", puTickCount_p);
+    debug!("IoGetTickCount({puTickCount_p:?})");
 
     catch_unwind! {{
         check_ptr!(puTickCount_p, IoResult::InvalidParameter);
@@ -361,7 +355,7 @@ pub extern "C" fn IoServiceWatchdog() -> IoResult {
 /// `pHwInfo_p` must point be a valid pointer
 #[no_mangle]
 pub unsafe extern "C" fn IoGetHardwareInfo(pHwInfo_p: *mut IoHwInfo) -> IoResult {
-    debug!("IoGetHardwareInfo({:?})", pHwInfo_p);
+    debug!("IoGetHardwareInfo({pHwInfo_p:?})");
 
     catch_unwind! {{
         check_ptr!(pHwInfo_p, IoResult::InvalidParameter);
@@ -421,7 +415,7 @@ pub extern "C" fn IoSetErrLed(fState_p: IoBool) -> IoResult {
 /// `sPath_p` must be a valid pointer
 #[no_mangle]
 pub unsafe extern "C" fn IoGetJson(sPath_p: *const std::os::raw::c_char) -> IoResult {
-    debug!("IoGetJson({:?})", sPath_p);
+    debug!("IoGetJson({sPath_p:?})");
 
     catch_unwind! {{
         check_ptr!(sPath_p, IoResult::InvalidParameter);
@@ -443,7 +437,7 @@ pub unsafe extern "C" fn IoGetJson(sPath_p: *const std::os::raw::c_char) -> IoRe
 /// `pfRunSwitch_p` must be a valid pointer
 #[no_mangle]
 pub unsafe extern "C" fn IoGetRunSwitch(pfRunSwitch_p: *mut IoBool) -> IoResult {
-    debug!("IoGetRunSwitch({:?})", pfRunSwitch_p);
+    debug!("IoGetRunSwitch({pfRunSwitch_p:?})");
 
     catch_unwind! {{
         check_ptr!(pfRunSwitch_p, IoResult::InvalidParameter);
@@ -467,7 +461,7 @@ pub unsafe extern "C" fn IoGetRunSwitch(pfRunSwitch_p: *mut IoBool) -> IoResult 
 /// `pfConfig_p` must be a valid pointer
 #[no_mangle]
 pub unsafe extern "C" fn IoGetConfigEnabled(pfConfig_p: *mut IoBool) -> IoResult {
-    debug!("IoGetConfigEnabled({:?})", pfConfig_p);
+    debug!("IoGetConfigEnabled({pfConfig_p:?})");
 
     catch_unwind! {{
         check_ptr!(pfConfig_p, IoResult::InvalidParameter);
@@ -488,7 +482,7 @@ pub unsafe extern "C" fn IoGetConfigEnabled(pfConfig_p: *mut IoBool) -> IoResult
 /// @return IoResult Driver result code of type IoResult
 #[no_mangle]
 pub extern "C" fn IoSetOutput(uChannel_p: u8, fEnable_p: IoBool) -> IoResult {
-    debug!("IoSetOutput({}, {:?})", uChannel_p, *fEnable_p);
+    debug!("IoSetOutput({uChannel_p}, {:?})", *fEnable_p);
 
     catch_unwind! {{
         io_do! {
@@ -509,7 +503,7 @@ pub extern "C" fn IoSetOutput(uChannel_p: u8, fEnable_p: IoBool) -> IoResult {
 /// `pfState_p` must be a valid pointer
 #[no_mangle]
 pub unsafe extern "C" fn IoGetInput(uChannel_p: u8, pfState_p: *mut IoBool) -> IoResult {
-    debug!("IoGetInput({}, {:?})", uChannel_p, pfState_p);
+    debug!("IoGetInput({uChannel_p}, {pfState_p:?})");
 
     catch_unwind! {{
         check_ptr!(pfState_p, IoResult::InvalidParameter);
@@ -557,7 +551,7 @@ pub extern "C" fn IoRegisterInputCallback(
 /// @return IoResult Driver result code of type IoResult
 #[no_mangle]
 pub extern "C" fn IoUnregisterInputCallback(uChannel_p: u8) -> IoResult {
-    debug!("IoUnregisterInputCallback({})", uChannel_p);
+    debug!("IoUnregisterInputCallback({uChannel_p})");
 
     catch_unwind! {{
         io_do! {
@@ -578,7 +572,7 @@ pub extern "C" fn IoUnregisterInputCallback(uChannel_p: u8) -> IoResult {
 /// `puAdcValue_p` must be a valid pointer
 #[no_mangle]
 pub unsafe extern "C" fn IoAdcGetValue(uChannel_p: u8, puAdcValue_p: *mut u16) -> IoResult {
-    debug!("IoAdcGetValue({}, {:?})", uChannel_p, puAdcValue_p);
+    debug!("IoAdcGetValue({uChannel_p}, {puAdcValue_p:?})");
 
     catch_unwind! {{
         check_ptr!(puAdcValue_p, IoResult::InvalidParameter);
@@ -600,7 +594,7 @@ pub unsafe extern "C" fn IoAdcGetValue(uChannel_p: u8, puAdcValue_p: *mut u16) -
 /// @return IoResult Driver result code of type IoResult
 #[no_mangle]
 pub extern "C" fn IoAdcSetMode(uChannel_p: u8, uMode_p: IoAnalogMode) -> IoResult {
-    debug!("IoAdcSetMode({}, {})", uChannel_p, uMode_p as u8);
+    debug!("IoAdcSetMode({uChannel_p}, {})", uMode_p as u8);
 
     catch_unwind! {{
         io_do! {
@@ -617,7 +611,7 @@ pub extern "C" fn IoAdcSetMode(uChannel_p: u8, uMode_p: IoAnalogMode) -> IoResul
 /// @return IoResult Driver result code of type IoResult
 #[no_mangle]
 pub extern "C" fn IoDacSetValue(uChannel_p: u8, uValue_p: u16) -> IoResult {
-    debug!("IoDacSetValue({}, {})", uChannel_p, uValue_p);
+    debug!("IoDacSetValue({uChannel_p}, {uValue_p})");
 
     catch_unwind! {{
         io_do! {
@@ -642,8 +636,8 @@ pub extern "C" fn IoTmpSetMode(
     uType_p: IoTmpSensorType,
 ) -> IoResult {
     debug!(
-        "IoTmpSetMode({}, {}, {})",
-        uChannel_p, uMode_p as u8, uType_p as u8
+        "IoTmpSetMode({uChannel_p}, {}, {})",
+        uMode_p as u8, uType_p as u8
     );
 
     catch_unwind! {{
@@ -665,7 +659,7 @@ pub extern "C" fn IoTmpSetMode(
 /// `piValue_p` must be a valid pointer
 #[no_mangle]
 pub unsafe extern "C" fn IoTmpGetValue(uChannel_p: u8, piValue_p: *mut i32) -> IoResult {
-    debug!("IoTmpGetValue({}, {:?})", uChannel_p, piValue_p);
+    debug!("IoTmpGetValue({uChannel_p}, {piValue_p:?})");
 
     catch_unwind! {{
         check_ptr!(piValue_p, IoResult::InvalidParameter);
@@ -686,7 +680,7 @@ pub unsafe extern "C" fn IoTmpGetValue(uChannel_p: u8, piValue_p: *mut i32) -> I
 /// @return IoResult Driver result code of type IoResult
 #[no_mangle]
 pub extern "C" fn IoCntEnable(uChannel_p: u8, fEnable_p: IoBool) -> IoResult {
-    debug!("IoCntEnable({}, {:?})", uChannel_p, *fEnable_p);
+    debug!("IoCntEnable({uChannel_p}, {:?})", *fEnable_p);
 
     catch_unwind! {{
         io_do! {
@@ -710,10 +704,7 @@ pub extern "C" fn IoCntSetup(
     uTrigger_p: IoCntTrigger,
     uDir_p: IoCntDirection,
 ) -> IoResult {
-    debug!(
-        "IoCntSetMode({}, {:?}, {:?}, {:?})",
-        uChannel_p, uMode_p, uTrigger_p, uDir_p
-    );
+    debug!("IoCntSetMode({uChannel_p}, {uMode_p:?}, {uTrigger_p:?}, {uDir_p:?})");
 
     catch_unwind! {{
         io_do! {
@@ -730,7 +721,7 @@ pub extern "C" fn IoCntSetup(
 /// @return IoResult Driver result code of type IoResult
 #[no_mangle]
 pub extern "C" fn IoCntSetPreload(uChannel_p: u8, iPreload_p: i32) -> IoResult {
-    debug!("IoCntSetPreload({}, {})", uChannel_p, iPreload_p);
+    debug!("IoCntSetPreload({uChannel_p}, {iPreload_p})");
 
     catch_unwind! {{
         io_do! {
@@ -751,7 +742,7 @@ pub extern "C" fn IoCntSetPreload(uChannel_p: u8, iPreload_p: i32) -> IoResult {
 /// `piValue_p` must be a valid pointer
 #[no_mangle]
 pub unsafe extern "C" fn IoCntGetValue(uChannel_p: u8, piValue_p: *mut i32) -> IoResult {
-    debug!("IoCntGetValue({})", uChannel_p);
+    debug!("IoCntGetValue({uChannel_p})");
 
     catch_unwind! {{
         check_ptr!(piValue_p, IoResult::InvalidParameter);
@@ -771,7 +762,7 @@ pub unsafe extern "C" fn IoCntGetValue(uChannel_p: u8, piValue_p: *mut i32) -> I
 /// @return IoResult Driver result code of type IoResult
 #[no_mangle]
 pub extern "C" fn IoPwmEnable(uChannel_p: u8, fRun_p: bool) -> IoResult {
-    debug!("IoPwmEnable({} {})", uChannel_p, fRun_p);
+    debug!("IoPwmEnable({uChannel_p}, {fRun_p})");
 
     catch_unwind! {{
         io_do! {
@@ -789,7 +780,7 @@ pub extern "C" fn IoPwmEnable(uChannel_p: u8, fRun_p: bool) -> IoResult {
 /// @return IoResult Driver result code of type IoResult
 #[no_mangle]
 pub extern "C" fn IoPwmSetup(uChannel_p: u8, period: u16, duty_cycle: u16) -> IoResult {
-    debug!("IoPwmSetup({}, {:?}, {:?})", uChannel_p, period, duty_cycle);
+    debug!("IoPwmSetup({uChannel_p}, {period:?}, {duty_cycle:?})");
 
     catch_unwind! {{
         io_do! {
@@ -806,7 +797,7 @@ pub extern "C" fn IoPwmSetup(uChannel_p: u8, period: u16, duty_cycle: u16) -> Io
 /// @return IoResult Driver result code of type IoResult
 #[no_mangle]
 pub extern "C" fn IoPwmSetTimebase(uChannel_p: u8, timebase: IoPwmTimebase) -> IoResult {
-    debug!("IoPwmSetup({}, {:?},)", uChannel_p, timebase,);
+    debug!("IoPwmSetup({uChannel_p}, {timebase:?})");
 
     catch_unwind! {{
         io_do! {

@@ -151,12 +151,9 @@ impl PwmSysFs {
     fn update(&mut self, period: u32, duty_cycle: u32) -> Result<()> {
         let base_path = self.base_path();
         // The PWM cannot be used, if the period and duty_cycle are not initialized
-        write(format!("{}/duty_cycle", base_path), "0").ok(); // Ignore any error
-        write(format!("{}/period", base_path), format!("{}", period))?;
-        write(
-            format!("{}/duty_cycle", base_path),
-            format!("{}", duty_cycle),
-        )?;
+        write(format!("{base_path}/duty_cycle"), "0").ok(); // Ignore any error
+        write(format!("{base_path}/period"), format!("{period}"))?;
+        write(format!("{base_path}/duty_cycle"), format!("{duty_cycle}"))?;
         Ok(())
     }
 
@@ -165,10 +162,10 @@ impl PwmSysFs {
     }
 
     fn enable(&mut self, enable: bool) -> Result<()> {
-        debug!("Set PWM {} = {}", self.channel, enable);
+        debug!("Set PWM {} = {enable}", self.channel);
         let base_path = self.base_path();
         let v = if enable { b"1" } else { b"0" };
-        write(format!("{}/enable", base_path), v)?;
+        write(format!("{base_path}/enable"), v)?;
         Ok(())
     }
 }
@@ -330,6 +327,29 @@ impl Pwm {
                 inner: Arc::clone(inner),
             },
         }
+    }
+
+    pub fn from_platform(plat_name: &str, channel: usize) -> crate::error::Result<Pwm> {
+        let plat_path = std::path::PathBuf::from("/sys/bus/platform/devices/")
+            .join(plat_name)
+            .join("pwm");
+
+        for entry in plat_path.read_dir()? {
+            let entry = entry?;
+            let path = entry.path();
+            let name = path.file_name();
+
+            let Some(name) = name else {
+                continue;
+            };
+
+            if let Some(num) = name.to_string_lossy().strip_prefix("pwmchip") {
+                let chip = num.parse()?;
+                return Ok(Self::new(chip, channel));
+            };
+        }
+
+        Err(crate::error::Error::generic_access_error())
     }
 }
 

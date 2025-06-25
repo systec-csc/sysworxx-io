@@ -60,7 +60,7 @@ pub fn main() {
     match io.init() {
         Ok(()) => {}
         Err(e) => {
-            eprintln!("Failed to initialize: {}", e);
+            eprintln!("Failed to initialize: {e}");
             std::process::exit(1);
         }
     }
@@ -70,7 +70,7 @@ pub fn main() {
     let mut shm_server = match shm::ShmServer::new() {
         Ok(shared) => shared,
         Err(e) => {
-            eprintln!("Failed to create/open shared memory: {}", e);
+            eprintln!("Failed to create/open shared memory: {e}");
             std::process::exit(1);
         }
     };
@@ -103,7 +103,7 @@ pub fn main() {
         let tx = tx.clone();
 
         thread::Builder::new()
-            .name(format!("worker{}", index))
+            .name(format!("worker{index}"))
             .spawn(move || loop {
                 let evt = mapping.notifier.recv();
 
@@ -144,7 +144,7 @@ pub fn main() {
     let signal_notifier = match signal::notify(&[signal::SIGINT, signal::SIGTERM]) {
         Ok(notifier) => notifier,
         Err(e) => {
-            eprintln!("Failed to create signal notifier: {}", e);
+            eprintln!("Failed to create signal notifier: {e}");
             std::process::exit(1);
         }
     };
@@ -179,14 +179,14 @@ pub fn main() {
                                 shm::Config::Change(mode) => {
                                     let mut io = io.lock().unwrap();
 
-                                    debug!("Set mode AIN{}: {:?}", i, mode);
+                                    debug!("Set mode AIN{i}: {mode:?}");
 
                                     match io.analog_mode_set(i, mode) {
                                         Ok(()) => {}
                                         Err(e) => {
                                             eprintln!("Failed to change configuration:");
-                                            eprintln!("    AIN{} to {:?}", i, mode);
-                                            eprintln!("    error: {}", e);
+                                            eprintln!("    AIN{i} to {mode:?}");
+                                            eprintln!("    error: {e}");
                                         }
                                     }
                                 }
@@ -202,14 +202,14 @@ pub fn main() {
                                 shm::Config::Change(ref cfg) => {
                                     let mut io = io.lock().unwrap();
 
-                                    debug!("Set mode TMP{}: {:?} / {:?}", i, cfg.0, cfg.1);
+                                    debug!("Set mode TMP{i}: {:?} / {:?}", cfg.0, cfg.1);
 
                                     match io.tmp_set_mode(i, cfg.0, cfg.1) {
                                         Ok(()) => {}
                                         Err(e) => {
                                             eprintln!("Failed to change configuration:");
-                                            eprintln!("    TMP{} to {:?}", i, cfg);
-                                            eprintln!("    error: {}", e);
+                                            eprintln!("    TMP{i} to {cfg:?}");
+                                            eprintln!("    error: {e}");
                                         }
                                     }
                                 }
@@ -227,7 +227,7 @@ pub fn main() {
 
             recv(signal_notifier) -> signal => match signal {
                 Ok(signal) => {
-                    info!("Exit due to signal: {}", signal);
+                    info!("Exit due to signal: {signal}");
                     drop(shm_server);
                     break;
                 }

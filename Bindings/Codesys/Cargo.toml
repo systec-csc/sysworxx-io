@@ -1,10 +1,11 @@
 [package]
 name = "codesys-connector"
 version = "2.2.0"
+authors = ["Christian Schuster"]
 edition = "2021"
-homepage = "http://www.systec-electronic.com"
-description = "Application to connect a CODESYS PLC runtime with the sysworxx-io on sysWORXX Devices"
 license = "LGPL-3.0-or-later"
+homepage = "https://www.systec-electronic.com"
+description = "Application to connect a CODESYS PLC runtime with the sysworxx-io on sysWORXX Devices"
 
 [dependencies]
 anyhow = "1.0.95"

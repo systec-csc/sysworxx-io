@@ -23,7 +23,7 @@ This workspace contains:
 
 ## Development Dependencies
 
-- Rust Version 1.75
+- Rust Version 1.85.1
 - Install *Docker* and *cross* for generic cross compile
 - Install *Yocto SDK* for platform/version specific cross compile
 - Install *libiio* and *libsensor* for native build (compile test)

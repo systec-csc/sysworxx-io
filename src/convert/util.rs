@@ -30,9 +30,9 @@ fn find_index(haystack: &[f64], resistance: f64) -> (usize, usize) {
 #[inline(always)]
 pub fn reverse_lookup(haystack: &[f64], value: f64, start_value: f64, stepsize: f64) -> f64 {
     if value <= haystack[0] {
-        std::f64::NEG_INFINITY
+        f64::NEG_INFINITY
     } else if value >= haystack[haystack.len() - 1] {
-        std::f64::INFINITY
+        f64::INFINITY
     } else {
         let (i, j) = find_index(haystack, value);
 
