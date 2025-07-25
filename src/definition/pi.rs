@@ -102,15 +102,12 @@ fn build_sysworxx_pi_inputs() -> Vec<Box<dyn DigitalInput>> {
 
 /// Build outputs for RGB-LED and all gpio-chips ('gpio-aggregator') with name 'sysworxx-' with
 /// stable order.
-fn build_sysworxx_pi_outputs() -> Vec<Box<dyn DigitalOutput>> {
-    // TODO: simplify this when transitioning to character devices
-    let lookup: Lookup = Lookup::new();
-    let mut outputs = vec![
-        lookup.gpio_do("LED_BL", "600000.gpio", 11) as Box<dyn DigitalOutput>,
-        lookup.gpio_do("LED_RD", "600000.gpio", 12) as Box<dyn DigitalOutput>,
-        lookup.gpio_do("LED_GN", "600000.gpio", 14) as Box<dyn DigitalOutput>,
-    ];
+fn build_sysworxx_pi_outputs(lookup: &Lookup) -> Vec<Box<dyn DigitalOutput>> {
+    const LINES_BEFORE_LED_MAX: usize = 40;
 
+    let mut outputs: Vec<Box<dyn DigitalOutput>> = vec![];
+
+    // TODO: simplify this when transitioning to character devices
     let mut chips: Vec<_> = gpio_cdev::chips()
         .expect("chip iterator")
         .filter_map(|c| c.ok())
@@ -140,10 +137,26 @@ fn build_sysworxx_pi_outputs() -> Vec<Box<dyn DigitalOutput>> {
         }
     }
 
+    // unlikely to happen, but just to be sure
+    outputs.truncate(LINES_BEFORE_LED_MAX);
+
+    outputs.extend(
+        (0..(LINES_BEFORE_LED_MAX - outputs.len()))
+            .into_iter()
+            .map(Box::new(|_| {
+                Box::new(null::Output::not_implemented()) as Box<dyn DigitalOutput>
+            })),
+    );
+
+    // Box::new(null::Output::not_implemented()); LINES_BEFORE_LED_MAX + LED_COUNT
+
+    outputs.push(lookup.gpio_do("LED_BL", "600000.gpio", 11) as Box<dyn DigitalOutput>);
     outputs
 }
 
 pub fn definition() -> Io {
+    let lookup: Lookup = Lookup::new();
+
     let tmp0 = Box::new(Labeled::new(
         "CPU",
         sensors::LmSensor::new("main1_thermal-virtual-0", Duration::from_millis(2000)),
@@ -151,11 +164,11 @@ pub fn definition() -> Io {
 
     Io {
         watchdog: Box::new(null::Wdg::new()),
-        run_led: Box::new(null::Output::not_implemented()),
-        err_led: Box::new(null::Output::not_implemented()),
+        run_led: lookup.gpio_do("LED_GN", "600000.gpio", 14) as Box<dyn DigitalOutput>,
+        err_led: lookup.gpio_do("LED_RD", "600000.gpio", 12) as Box<dyn DigitalOutput>,
         run_switch: Box::new(null::Input::not_implemented()),
         config_switch: Box::new(null::Input::not_implemented()),
-        outputs: build_sysworxx_pi_outputs(),
+        outputs: build_sysworxx_pi_outputs(&lookup),
         inputs: build_sysworxx_pi_inputs(),
         analog_inputs: vec![],
         analog_outputs: vec![],
