@@ -1,6 +1,6 @@
 [package]
 name = "SysworxxIoCsbindgen"
-version = "2.2.0"
+version = "2.3.0"
 authors = ["Andreas Dinter"]
 edition = "2021"
 license = "LGPL-3.0-or-later"
