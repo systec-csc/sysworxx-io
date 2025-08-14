@@ -5,7 +5,7 @@ build-backend = "maturin"
 [project]
 name = 'sysworxx-io-py'
 description = "Python bindings to syswoxx-io"
-version = "2.2.0"
+version = "2.3.0"
 requires-python = '>=3.8'
 authors = [
     { name = 'Andreas Dinter', email = 'andreas.dinter@systec-electronic.com' },

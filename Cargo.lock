@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "SysworxxIoCsbindgen"
-version = "2.2.0"
+version = "2.3.0"
 dependencies = [
  "csbindgen",
 ]
@@ -315,7 +315,7 @@ dependencies = [
 
 [[package]]
 name = "codesys-connector"
-version = "2.2.0"
+version = "2.3.0"
 dependencies = [
  "anyhow",
  "askama",
@@ -453,7 +453,7 @@ dependencies = [
 
 [[package]]
 name = "ctr700drv"
-version = "2.2.0"
+version = "2.3.0"
 dependencies = [
  "env_logger",
  "lazy_static",
@@ -1688,7 +1688,7 @@ dependencies = [
 
 [[package]]
 name = "sysworxx-io"
-version = "2.2.0"
+version = "2.3.0"
 dependencies = [
  "criterion",
  "crossbeam-channel",
@@ -1714,7 +1714,7 @@ dependencies = [
 
 [[package]]
 name = "sysworxx-io-js"
-version = "2.2.1"
+version = "2.3.0"
 dependencies = [
  "lazy_static",
  "neon",
@@ -1723,7 +1723,7 @@ dependencies = [
 
 [[package]]
 name = "sysworxx-io-py"
-version = "0.1.0"
+version = "2.3.0"
 dependencies = [
  "indexmap",
  "once_cell",

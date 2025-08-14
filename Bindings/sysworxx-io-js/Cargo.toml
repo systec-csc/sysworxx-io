@@ -1,6 +1,6 @@
 [package]
 name = "sysworxx-io-js"
-version = "2.2.1"
+version = "2.3.0"
 authors = ["Christian Schuster"]
 license = "LGPL-3.0-or-later"
 edition = "2018"
