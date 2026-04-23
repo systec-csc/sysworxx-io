@@ -9,3 +9,17 @@ target
 
 workspace
 Dist
+
+.bashrc
+.bash_profile
+.claude
+.gitconfig
+.gitmodules
+.idea
+.mcp.json
+*.sln
+.profile
+.ripgreprc
+.vscode
+.zprofile
+.zshrc
