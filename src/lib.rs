@@ -244,37 +244,43 @@ impl Io {
     // FIXME: actually the reference does not need to be mutable
     //        but for now make it to avoid compiler warnings
     pub fn write_json_info(&mut self, path: &str) -> Result<()> {
-        use serde_json::{json, Value};
+        let mut obj = json::object! {
+            outputs: { },
+            inputs: { },
+            watchdog: { },
+            run_led: { },
+            run_switch: { },
+            config_switch: { },
+            analog_inputs: { },
+            analog_outputs: { },
+            temp_sensors: { },
+            counter_inputs: { },
+            pwm_outputs: { },
+        };
 
-        let mut obj = json!({
-            "outputs": {},
-            "inputs": {},
-            "watchdog": {},
-            "run_led": {},
-            "run_switch": {},
-            "config_switch": {},
-            "analog_inputs": {},
-            "analog_outputs": {},
-            "temp_sensors": {},
-            "counter_inputs": {},
-            "pwm_outputs": {},
-        });
-
-        fn add_to_json<T: IoChannel + ?Sized>(obj: &mut Value, key: &str, channels: &[Box<T>]) {
+        fn add_to_json<T: IoChannel + ?Sized>(
+            json: &mut json::JsonValue,
+            key: &str,
+            channels: &[Box<T>],
+        ) -> Result<()> {
             for (i, channel) in channels.iter().enumerate() {
                 if let Some(label) = channel.label() {
-                    obj[key][i.to_string()] = Value::String(label.to_string());
+                    json[key]
+                        .insert(&i.to_string(), label)
+                        .map_err(|_| Error::GenericError)?;
                 }
             }
+
+            Ok(())
         }
 
-        add_to_json(&mut obj, "outputs", &self.outputs);
-        add_to_json(&mut obj, "inputs", &self.inputs);
-        add_to_json(&mut obj, "analog_inputs", &self.analog_inputs);
-        add_to_json(&mut obj, "temp_sensors", &self.temp_sensors);
-        add_to_json(&mut obj, "counter_inputs", &self.counter_inputs);
-        add_to_json(&mut obj, "analog_outputs", &self.analog_outputs);
-        let obj_str = obj.to_string();
+        add_to_json(&mut obj, "outputs", &self.outputs)?;
+        add_to_json(&mut obj, "inputs", &self.inputs)?;
+        add_to_json(&mut obj, "analog_inputs", &self.analog_inputs)?;
+        add_to_json(&mut obj, "temp_sensors", &self.temp_sensors)?;
+        add_to_json(&mut obj, "counter_inputs", &self.counter_inputs)?;
+        add_to_json(&mut obj, "analog_outputs", &self.analog_outputs)?;
+        let obj_str = obj.dump();
         let mut file = File::create(path).expect("Error creating file to write information!");
         file.write(obj_str.as_bytes())
             .map_err(|_| Error::GenericError)?;

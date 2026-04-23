@@ -23,14 +23,6 @@
       "sysworxx_err_led": "./dist/nodes/sysworxx_err_led.js"
     }
   },
-  "overrides": {
-    "flatted": ">=3.4.2",
-    "minimatch": ">=3.1.4",
-    "picomatch": ">=2.3.2",
-    "ajv": ">=6.14.0",
-    "axios": ">=1.15.0",
-    "brace-expansion": ">=1.1.13"
-  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.52.0",
     "@typescript-eslint/parser": "^5.52.0",
